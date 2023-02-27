@@ -16,6 +16,7 @@ from pygame import freetype
 
 
 #Initialzation
+pygame.init()
 pygame.mixer.init()
 pygame.font.init()
 pygame.display.init()
@@ -33,6 +34,7 @@ sound = True
 WIDTH, HEIGHT = 400, 400
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED|pygame.RESIZABLE)
 pygame.display.set_caption("Space Invader")
+pygame.display.set_icon(pygame_icon)
  
 class Laser:
     global lasers
@@ -169,7 +171,6 @@ def collide(obj1, obj2):
  
  #score saving & showing 
 def save(highscores):
-
     conn = sqlite3.connect('SPACE.db') 
     cursor = conn.cursor() 
     cursor.execute('INSERT INTO score (RANK , PLAYER_NAME, SCORE) VALUES' + str(highscores) + ';')
@@ -179,12 +180,17 @@ def save(highscores):
 def load():
    conn = sqlite3.connect('SPACE.db') 
    cursor = conn.cursor()  
-   cursor.execute('select PLAYER_NAME, SCORE from score order by SCORE desc;')
+   cursor.execute('select PLAYER_NAME, SCORE from score order by SCORE desc limit 10;')
    b = cursor.fetchall()
    conn.close()
    return b
 
- 
+def reset():
+    conn = sqlite3.connect('SPACE.db') 
+    cursor = conn.cursor() 
+    cursor.execute('DELETE FROM score;')
+    conn.commit()
+    conn.close()    
  
 def main():
     global SCORE, lasers, FPS  
@@ -198,7 +204,7 @@ def main():
     laser_vel = 2
     player_vel = laser_vel - 1
     enemy_vel = laser_vel - 1
-    spawn_distance = -1500
+    spawn_distance = -1000
     shoot_rate = FPS*3
 
     player = Player(WIDTH//2- PLAYER_SPACE_SHIP. get_width()//6,  HEIGHT-PLAYER_SPACE_SHIP. get_height()//3)
@@ -272,8 +278,8 @@ def main():
                          mixer.Sound.play(sfx2) #shoot 
                      player.shoot()
 
-        keys = pygame.key.get_pressed()
         
+        keys = pygame.key.get_pressed()
         #left
         if keys[pygame.K_a] and player.x - player_vel > 0 : #left
             player.x -= player_vel +2
@@ -343,11 +349,43 @@ def score_board():
             WIN.blit(BG,(0,0))    
             show_score()
             highscore_button.draw(WIN)
-            main_menu_button = Button(WIDTH/2 - main_menu_img.get_width()/8, HEIGHT - main_menu_img.get_height()/2.5, main_menu_img, .25)
+            main_menu_button = Button(WIDTH/2 - main_menu_img.get_width()/2.5, HEIGHT - main_menu_img.get_height()/2.5, main_menu_img, .25)
+            reset_button = Button(WIDTH/(2/3) - main_menu_img.get_width(), HEIGHT - reset_img.get_height()/2.9, reset_img, .24)
           
             for event in pygame.event.get():
-                if main_menu_button.draw(WIN) or event.type == KEYDOWN and event.key == K_ESCAPE :
+                if main_menu_button.draw(WIN) or event.type == KEYDOWN and event.key == K_ESCAPE:
                     run = False 
+                if reset_button.draw(WIN):
+                    reset_prompt()
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                            
+                pygame.display.update()  
+                  
+def reset_prompt():    
+        run = True 
+        while run:
+            WIN.blit(BG,(0,0))   
+            font = pygame.font.SysFont("consolas", 35) 
+            help_ = font.render(f"RESET SCORE", 1, (255,10,25))
+            WIN.blit(help_, (100,20))
+            main_menu_button = Button(WIDTH/2 - main_menu_img.get_width()/8, HEIGHT - main_menu_img.get_height()/2.5, main_menu_img, .3)
+           
+            yes_button = Button(WIDTH/2  - no_img.get_width()/2.5, 150, yes_img, .35)
+            no_button = Button(WIDTH/2  + no_img.get_width()/20, 150, no_img, .35)
+            
+            for event in pygame.event.get():
+                if main_menu_button.draw(WIN) or event.type == KEYDOWN and event.key == K_ESCAPE:
+                    run = False 
+                if yes_button.draw(WIN):  
+                    reset()
+                    time.sleep(0.2)
+                    run =  False
+                if no_button.draw(WIN): 
+                    run =  False
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                            
                 pygame.display.update()                    
               
 def paused():
@@ -374,7 +412,7 @@ def paused():
                         won()                 
                     else:
                         game_over()  
-                if event.type == KEYDOWN and event.key == K_ESCAPE:
+                if (event.type == KEYDOWN and event.key == K_ESCAPE) or event.type == pygame.QUIT:
                         run = False 
                         quit()
             
@@ -432,7 +470,7 @@ def game_over():
                         run = False
                         main()
                        
-                    if main_menu_button.draw(WIN) or event.type == KEYDOWN and event.key == K_ESCAPE:         
+                    if main_menu_button.draw(WIN) or (event.type == KEYDOWN and event.key == K_ESCAPE) or event.type == pygame.QUIT:         
                         run = False 
                         main_menu()
                     SCORE = 0
@@ -461,29 +499,32 @@ def won():
             lost_lab = lost_font.render(f"Your Score: {SCORE}", 1, (255,255,255))
             
             for event in pygame.event.get():
-                  if event.type == MOUSEBUTTONDOWN:
+                if event.type == MOUSEBUTTONDOWN:
                         if input_rect.collidepoint(event.pos): 
                             active = True
                         else: 
                             active = False                          
                             
-                  if event.type == pygame.KEYDOWN: 
+                if event.type == pygame.KEYDOWN: 
                         if event.key == pygame.K_BACKSPACE:
                             user_text = user_text[:-1]  
                             if input_rect.x <= 150:
                                 input_rect.x  += 10
                         elif len(user_text) >= 12:                                  
                             WIN.blit(warn,(90,190))
+                            time.sleep(1)
                             
                         else :         
                             if event.unicode not in "1234567890":     
                                 user_text += event.unicode
                                 if input_rect.x >= 100:
                                     input_rect.x  -= 10
-                  if event.type == KEYDOWN and event.key == K_ESCAPE:
+                if (event.type == KEYDOWN and event.key == K_ESCAPE):
                         quit()
-                        
-                  if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                if  event.type == pygame.QUIT:
+                      sys.exit()
+                      
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     user_text = user_text[:-1]
                     if user_text != '':
                         highscores = (score_key+1,user_text,SCORE) 
@@ -492,8 +533,8 @@ def won():
                         main_menu() 
                     else:           
                         WIN.blit(warn,(90,190))
-                        time.sleep(0.5)
-                        
+                        time.sleep(1)
+                # pygame.display.update()     
             if active: 
                 color = color_active        
                 border = 2       
@@ -524,7 +565,7 @@ def won():
                     main_menu() 
                 else:           
                     WIN.blit(warn,(90,190))
-                    time.sleep(0.1)
+                    time.sleep(1)
             
             pygame.display.update()
             
@@ -549,14 +590,19 @@ def main_menu():
                 option()
             if about_button.draw(WIN):
                 about()       	      	
-            if exit_button.draw(WIN) or event.type == KEYDOWN and event.key == K_ESCAPE:
-                time.sleep(0.1)
-                # quit()
-                run = False
             if help_button.draw(WIN):
                 help()
+            if exit_button.draw(WIN) or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                time.sleep(0.1)
+                run = False
+            if event.type == pygame.QUIT:
+                pygame.display.update()
+                sys.exit()
             pygame.display.update()
                     
     pygame.quit()
-    
-main_menu()
+
+#####Program execution #####
+if __name__ == "__main__":
+
+        main_menu()

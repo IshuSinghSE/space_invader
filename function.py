@@ -11,11 +11,11 @@ sound = True
 IMAGES = {}
 FONT = "comicsans"  
                
-                                 ##########  MAINS #######
+                 
+                                    ##########  MAINS #######
 
 def scn(image):
     return pygame.transform.scale(image,(20,24))
-IMAGES['numbers'] = (scn(pygame.image.load(resource_path('assets/sprites/0.png')).convert_alpha()), scn(pygame.image.load(resource_path('assets/sprites/1.png')).convert_alpha()), scn(pygame.image.load('assets/sprites/2.png').convert_alpha()), scn(pygame.image.load('assets/sprites/3.png').convert_alpha()), scn(pygame.image.load('assets/sprites/4.png').convert_alpha()), scn(pygame.image.load('assets/sprites/5.png').convert_alpha()), scn(pygame.image.load('assets/sprites/6.png').convert_alpha()), scn(pygame.image.load('assets/sprites/7.png').convert_alpha()), scn(pygame.image.load('assets/sprites/8.png').convert_alpha()), scn(pygame.image.load('assets/sprites/9.png').convert_alpha()))
 
 
 def scx(image):
@@ -40,6 +40,8 @@ BLUE_LASER = scx(pygame.image.load(resource_path(os.path.join("assets", "pixel_l
 YELLOW_LASER = scx(pygame.image.load(resource_path(os.path.join("assets", "pixel_laser_yellow.png"))))
 PLAYER_LASER = scx(pygame.image.load(resource_path(os.path.join("assets", "pixel_laser_player.png"))))
 
+#SCORE
+IMAGES['numbers'] = (scn(pygame.image.load(resource_path('assets/sprites/0.png')).convert_alpha()), scn(pygame.image.load(resource_path('assets/sprites/1.png')).convert_alpha()), scn(pygame.image.load('assets/sprites/2.png').convert_alpha()), scn(pygame.image.load('assets/sprites/3.png').convert_alpha()), scn(pygame.image.load('assets/sprites/4.png').convert_alpha()), scn(pygame.image.load('assets/sprites/5.png').convert_alpha()), scn(pygame.image.load('assets/sprites/6.png').convert_alpha()), scn(pygame.image.load('assets/sprites/7.png').convert_alpha()), scn(pygame.image.load('assets/sprites/8.png').convert_alpha()), scn(pygame.image.load('assets/sprites/9.png').convert_alpha()))
 
 #SUB_FUNCTION
 
@@ -97,7 +99,8 @@ def about():
             for event in pygame.event.get(): 
                 if main_menu_button.draw(WIN)  or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     running = False 
-                                
+                if event.type == pygame.QUIT:
+                    sys.exit()                
                 pygame.display.update()        
 
 def help():
@@ -134,22 +137,23 @@ def help():
             for event in pygame.event.get(): 
                 if main_menu_button.draw(WIN)  or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     running = False 
-                                
+                if event.type == pygame.QUIT:
+                    sys.exit()                
                 pygame.display.update() 
 
 
 def Name():   
-                title_font = pygame.font.SysFont("", 40)                
-                sfx_font = pygame.font.SysFont("", 30)
-                
-                title = title_font.render(" SETTING ", 1, ('dodgerblue'))
-                WIN.blit(title, (WIDTH/2 - title.get_width()/2, 50))
-                               
-                music = sfx_font.render("MUSIC", 1, ('aliceblue'))
-                WIN.blit(music, (WIDTH/2 - music.get_width()*1.65, spacing*1.2))            
-                
-                sound = sfx_font.render("SOUND", 1, ('aliceblue'))
-                WIN.blit(sound, (WIDTH/2 + sound.get_width()/1.8, spacing*1.2))
+            title_font = pygame.font.SysFont("", 40)                
+            sfx_font = pygame.font.SysFont("", 30)
+            
+            title = title_font.render(" SETTING ", 1, ('dodgerblue'))
+            WIN.blit(title, (WIDTH/2 - title.get_width()/2, 50))
+                           
+            music = sfx_font.render("MUSIC", 1, ('aliceblue'))
+            WIN.blit(music, (WIDTH/2 - music.get_width()*1.65, spacing*1.2))            
+            
+            sound = sfx_font.render("SOUND", 1, ('aliceblue'))
+            WIN.blit(sound, (WIDTH/2 + sound.get_width()/1.8, spacing*1.2))
                
 def option():
             global music , sound        
@@ -204,7 +208,8 @@ def option():
 
                 if main_menu_button.draw(WIN) or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     run=False
-              
+                if event.type == pygame.QUIT:
+                    sys.exit()
                 pygame.display.update()       
 
                                  

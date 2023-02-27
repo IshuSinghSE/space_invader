@@ -1,4 +1,4 @@
-import pygame, os, time, sys
+import pygame, os, time
 from pygame import mixer 
 
 def resource_path(relative_path):
@@ -17,6 +17,7 @@ mixer.init()
                                 # CHECKED #
 WIDTH , HEIGHT = (400,400)
 WIN = pygame.display.set_mode((400,400), pygame.SCALED)#| pygame.FULLSCREEN)
+
 line_height = HEIGHT//8
 spacing = 120
 scale1 = 0.5
@@ -28,8 +29,12 @@ BG = pygame.transform.scale(pygame.image.load(resource_path(os.path.join("assets
 
 clicked = mixer.Sound(resource_path("assets/music/click.wav"))
 
+#ICON
+pygame_icon = pygame.image.load(resource_path("assets/logo/icon.ico")).convert_alpha()
+
 #button class
 class Button():
+
 	def __init__(self, x, y, image, scale):
 		width = image.get_width()
 		height = image.get_height()
@@ -102,6 +107,9 @@ resume_img = pygame.image.load(resource_path('assets/button/resume.png')).conver
 retry_img = pygame.image.load(resource_path('assets/button/retry.png')).convert_alpha()
 quit_img = pygame.image.load(resource_path('assets/button/quit.png')).convert_alpha()
 main_menu_img = pygame.image.load(resource_path('assets/button/main_menu.png')).convert_alpha()
+reset_img = pygame.image.load(resource_path('assets/button/reset.png')).convert_alpha()
+yes_img = pygame.image.load(resource_path('assets/button/yes.png')).convert_alpha()
+no_img = pygame.image.load(resource_path('assets/button/no.png')).convert_alpha()
 
 resume_button = Button(WIDTH/2- start_img.get_width()/7, spacing, resume_img, scale2)
 retry_button = Button(WIDTH/2 - score_img.get_width()/7, spacing+2*line_height, retry_img, scale2-0.03)
